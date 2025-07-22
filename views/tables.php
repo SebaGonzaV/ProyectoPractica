@@ -33,43 +33,43 @@ try {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Relaciones entre Tablas</title>
+    <title>Gestión de Tablas</title>
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f5f5f5;
-            padding: 30px;
+            font-family: Arial, sans-serif;
+            padding: 20px;
         }
         h2 {
-            color: #002855;
+            color: #00417d;
         }
         #network {
             width: 100%;
-            height: 600px;
+            height: 500px;
             border: 1px solid #ccc;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
-        .tabla-form {
+        .acciones {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 8px #ccc;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
         }
-        select, button {
-            padding: 10px;
+        form {
+            margin: 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        select, button, input[type="text"] {
+            padding: 8px;
             font-size: 15px;
-            border-radius: 5px;
-            border: 1px solid #aaa;
+            border-radius: 4px;
+            border: 1px solid #ccc;
         }
         button {
-            background-color: #0072ce;
+            background-color: #0077cc;
             color: white;
             border: none;
             cursor: pointer;
@@ -77,85 +77,103 @@ try {
         button:hover {
             background-color: #005fa3;
         }
+        input[type="text"] {
+            width: 200px;
+        }
     </style>
 </head>
 <body>
-    <h2>🧩 Diagrama de Relaciones</h2>
-    <div id="network"></div>
 
-    <div class="tabla-form">
-        <form action="create_table.php" method="GET">
-            <button type="submit">➕ Crear nueva tabla</button>
-        </form>
+<h2>Relaciones entre Tablas (<?= htmlspecialchars($conexion['base']) ?>)</h2>
 
-        <form action="dashboard.php" method="GET">
-            <button type="submit">⬅️ Volver al panel</button>
-        </form>
+<div id="network"></div>
 
-        <form method="POST" onsubmit="return confirm('¿Seguro que deseas eliminar esta tabla?')">
-            <select name="tabla_a_eliminar" required>
-                <option value="" disabled selected>Selecciona una tabla</option>
-                <?php foreach ($tablas as $tabla): ?>
-                    <option value="<?= $tabla ?>"><?= $tabla ?></option>
-                <?php endforeach; ?>
-            </select>
-            <button type="submit">🗑️ Eliminar tabla</button>
-        </form>
-    </div>
+<div class="acciones">
+    <form action="create_table.php" method="GET">
+        <button type="submit">➕ Crear nueva tabla</button>
+    </form>
 
-    <script>
-        const nodes = new vis.DataSet([
-            <?php foreach ($tablas as $tabla): ?>
-                { id: '<?= $tabla ?>', label: '<?= $tabla ?>', shape: 'box' },
-            <?php endforeach; ?>
-        ]);
+    <form action="dashboard.php" method="GET">
+        <button type="submit">⬅️ Volver al panel</button>
+    </form>
 
-        const edges = new vis.DataSet([
-            <?php foreach ($relaciones as $rel): ?>
-                { from: '<?= $rel["TABLE_NAME"] ?>', to: '<?= $rel["REFERENCED_TABLE_NAME"] ?>', arrows: 'to' },
-            <?php endforeach; ?>
-        ]);
+    <select id="tablaSeleccionada" required>
+        <option value="" disabled selected>Selecciona tabla a eliminar</option>
+        <?php foreach ($tablas as $tabla): ?>
+            <option value="<?= $tabla ?>"><?= $tabla ?></option>
+        <?php endforeach; ?>
+    </select>
+    <button type="button" onclick="eliminarTabla()">🗑️ Eliminar tabla</button>
 
-        const container = document.getElementById('network');
-        const data = { nodes: nodes, edges: edges };
-        const options = {
-            layout: { improvedLayout: true },
-            physics: {
-                enabled: true,
-                solver: "forceAtlas2Based",
-                forceAtlas2Based: {
-                    gravitationalConstant: -30,
-                    springLength: 120,
-                    springConstant: 0.05
-                },
-                stabilization: { iterations: 250 }
-            },
-            nodes: {
-                shape: 'box',
-                font: { face: 'Segoe UI' }
-            }
-        };
-        const network = new vis.Network(container, data, options);
+    <form action="auditoria.php" method="GET">
+        <button type="submit">📋 Ver auditoría</button>
+    </form>
 
-        network.on("doubleClick", function (params) {
-            if (params.nodes.length > 0) {
-                const tabla = params.nodes[0];
-                window.location.href = "crud.php?tabla=" + encodeURIComponent(tabla);
-            }
-        });
-    </script>
+    <!-- 🗃️ Exportar base .sql con nombre definido -->
+    <form action="../controllers/export_sql.php" method="GET" onsubmit="return validarNombreArchivo()">
+        <input type="text" name="nombre_archivo" placeholder="Nombre archivo SQL" required>
+        <button type="submit">🗃️ Exportar Base .sql</button>
+    </form>
+</div>
 
-<?php
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["tabla_a_eliminar"])) {
-    try {
-        $tabla = $_POST["tabla_a_eliminar"];
-        $pdo->exec("DROP TABLE `$tabla`");
-        echo "<script>alert('✅ Tabla $tabla eliminada correctamente'); location.href='tables.php';</script>";
-    } catch (Exception $e) {
-        echo "<script>alert('❌ Error al eliminar tabla: " . $e->getMessage() . "');</script>";
+<script>
+    const nodes = new vis.DataSet([
+        <?php foreach ($tablas as $tabla): ?>
+        { id: '<?= $tabla ?>', label: '<?= $tabla ?>', shape: 'box' },
+        <?php endforeach; ?>
+    ]);
+
+    const edges = new vis.DataSet([
+        <?php foreach ($relaciones as $rel): ?>
+        { from: '<?= $rel["TABLE_NAME"] ?>', to: '<?= $rel["REFERENCED_TABLE_NAME"] ?>', arrows: 'to' },
+        <?php endforeach; ?>
+    ]);
+
+    const container = document.getElementById('network');
+    const data = { nodes: nodes, edges: edges };
+    const options = {
+        layout: {
+            improvedLayout: true
+        },
+        physics: {
+            stabilization: true
+        }
+    };
+    const network = new vis.Network(container, data, options);
+
+    network.on("doubleClick", function (params) {
+        if (params.nodes.length > 0) {
+            const tabla = params.nodes[0];
+            window.location.href = "crud.php?tabla=" + encodeURIComponent(tabla);
+        }
+    });
+
+    function eliminarTabla() {
+        const select = document.getElementById("tablaSeleccionada");
+        const tabla = select.value;
+        if (!tabla) {
+            alert("⚠️ Debes seleccionar una tabla primero.");
+            return;
+        }
+        if (confirm(`¿Estás seguro de eliminar la tabla ${tabla}?`)) {
+            window.location.href = `../controllers/delete_table.php?tabla=${encodeURIComponent(tabla)}`;
+        }
     }
-}
-?>
+
+    function validarNombreArchivo() {
+        const input = document.querySelector('input[name="nombre_archivo"]');
+        const nombre = input.value.trim();
+        if (nombre === '') {
+            alert("⚠️ Debes ingresar un nombre para el archivo.");
+            return false;
+        }
+        if (!/^[a-zA-Z0-9_\-]+$/.test(nombre)) {
+            alert("❌ El nombre solo puede contener letras, números, guiones y guiones bajos.");
+            return false;
+        }
+        return true;
+    }
+</script>
+
 </body>
 </html>
-

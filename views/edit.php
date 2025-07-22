@@ -106,7 +106,7 @@ try {
         <input type="text" name="datos[<?= $nombre ?>]" value="<?= htmlspecialchars($registro[$nombre]) ?>" <?= $nombre === $pk ? "readonly" : "" ?>>
     <?php endforeach; ?>
 
-    <button type="submit">💾 Guardar cambios</button>
+    <button type="submit">💾 Guardar</button>
 </form>
 
 </body>

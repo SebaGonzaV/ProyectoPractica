@@ -77,7 +77,7 @@ function obtenerNombreRelacionado($pdo, $tabla_fk, $columna_fk, $valor_fk) {
 <head>
     <meta charset="UTF-8">
     <title>CRUD - <?= htmlspecialchars($tabla) ?></title>
-    <link rel="stylesheet" href="../assets/style.css">
+    <link rel="stylesheet" href="../assets/table-crud-style.css">
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;

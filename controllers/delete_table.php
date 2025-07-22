@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/auditoriaHelper.php';
+
 $conexion = $_SESSION['conexion'] ?? null;
 
 if (!$conexion || !isset($_GET['tabla'])) {
@@ -16,7 +18,6 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     if ($forzar) {
-        // Buscar tablas que dependan de esta tabla
         $refQuery = $pdo->prepare("
             SELECT TABLE_NAME
             FROM information_schema.KEY_COLUMN_USAGE
@@ -30,18 +31,35 @@ try {
 
         foreach ($refQuery->fetchAll(PDO::FETCH_ASSOC) as $ref) {
             $pdo->exec("DROP TABLE IF EXISTS `{$ref['TABLE_NAME']}`");
+
+            // Registrar en auditoría cada tabla foránea eliminada
+            $usuarioLog = isset($_SESSION["usuario"]["usuario"]) ? $_SESSION["usuario"]["usuario"] : "desconocido";
+            auditoriaHelper::log(
+                $usuarioLog,
+                'BORRAR TABLA FORÁNEA',
+                $ref['TABLE_NAME'],
+                "Se eliminó la tabla relacionada '{$ref['TABLE_NAME']}' por forzado desde '$tabla'"
+            );
         }
     }
 
-    // Eliminar la tabla principal
+    // Eliminar tabla principal
     $pdo->exec("DROP TABLE IF EXISTS `$tabla`");
+
+    // ✅ Auditoría
+    $usuarioLog = isset($_SESSION["usuario"]["nombre"]) ? $_SESSION["usuario"]["nombre"] : "desconocido";
+    auditoriaHelper::log(
+    $usuarioLog,
+    'DELETE',
+    $tabla,
+    "Se borró la tabla '$tabla'"
+);
 
     header("Location: ../views/tables.php");
     exit();
 
 } catch (PDOException $e) {
     if (strpos($e->getMessage(), 'Integrity constraint violation: 1451') !== false && !$forzar) {
-        // Buscar y mostrar relaciones en la advertencia
         $refQuery = $pdo->prepare("
             SELECT TABLE_NAME, COLUMN_NAME
             FROM information_schema.KEY_COLUMN_USAGE
@@ -74,4 +92,3 @@ try {
         exit();
     }
 }
-?>

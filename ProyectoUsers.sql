@@ -11,4 +11,4 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 INSERT INTO usuarios (nombre, correo, clave) VALUES
 ('Administrador', 'admin@uc.cl', 'admin123'),
-('Usuario de prueba', 'user@uc.cl', 'user123');
+('Usuario', 'user@uc.cl', 'user123');

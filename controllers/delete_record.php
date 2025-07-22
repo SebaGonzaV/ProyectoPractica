@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/auditoriaHelper.php';
 
 if (!isset($_SESSION["conexion"])) {
     header("Location: ../index.php");
@@ -20,11 +21,18 @@ try {
     $pdo = new PDO($dsn, $conexion["usuario"], $conexion["clave"]);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Intentar eliminar el registro
     $stmt = $pdo->prepare("DELETE FROM `$tabla` WHERE `$pk` = ?");
     $stmt->execute([$id]);
 
-    // Redireccionar si se eliminó exitosamente
+    auditoriaHelper::log(
+    $_SESSION["usuario"]['nombre'] ?? 'desconocido', // usuario
+    'DELETE',                                        // acción
+    $tabla,                                          // tabla
+    "Se eliminó un registro con id $id"             // detalle
+    );
+
+
+
     header("Location: ../views/crud.php?tabla=$tabla&msg=deleted");
     exit();
 
@@ -32,7 +40,6 @@ try {
     $msg = $e->getMessage();
 
     if (str_contains($msg, "Integrity constraint violation")) {
-        // Buscar qué tablas están referenciando esta tabla como FK
         $stmtRel = $pdo->prepare("
             SELECT TABLE_NAME, COLUMN_NAME
             FROM information_schema.KEY_COLUMN_USAGE
@@ -57,8 +64,6 @@ try {
         $mensaje = urlencode("❌ Error al eliminar: " . $msg);
     }
 
-    // Redirigir con mensaje de error
     header("Location: ../views/crud.php?tabla=$tabla&error=$mensaje");
     exit();
 }
-?>

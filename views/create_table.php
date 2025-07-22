@@ -13,8 +13,11 @@ $clave = $conexion["clave"];
 try {
     $pdo = new PDO($dsn, $usuario, $clave);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
     $tablasExistentes = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
+    $opcionesTablas = "";
+    foreach ($tablasExistentes as $t) {
+        $opcionesTablas .= "<option value='$t'>$t</option>";
+    }
 } catch (PDOException $e) {
     die("❌ Error de conexión: " . $e->getMessage());
 }
@@ -72,12 +75,30 @@ try {
             margin-top: 20px;
         }
     </style>
+</head>
+<body>
+    <h2>🧩 Crear Nueva Tabla</h2>
+
+    <form action="../controllers/createTableController.php" method="POST">
+        <label>Nombre de la tabla:</label>
+        <input type="text" name="tabla" required>
+
+        <div id="campos"></div>
+
+        <div class="botones">
+            <button type="button" onclick="agregarCampo()">➕ Agregar campo</button>
+            <button type="submit">💾 Crear tabla</button>
+            <a href="tables.php" style="margin-left: 20px; color: #00427a;">← Volver</a>
+        </div>
+    </form>
+
     <script>
         function agregarCampo() {
             const contenedor = document.getElementById("campos");
             const index = contenedor.children.length;
             const div = document.createElement("div");
             div.className = "campo";
+
             div.innerHTML = `
                 <label>Nombre del campo:</label>
                 <input type="text" name="campos[${index}][nombre]" required>
@@ -96,32 +117,47 @@ try {
                     <option value="1">Sí</option>
                 </select>
 
-                <label>¿Clave foránea?</label>
-                <select name="campos[${index}][fk_tabla]">
+                <label>¿Tabla foránea?</label>
+                <select name="campos[${index}][fk_tabla]" onchange="cargarColumnasForaneas(this, ${index})">
                     <option value="">No</option>
-                    <?php foreach ($tablasExistentes as $t): ?>
-                        <option value="<?= $t ?>"><?= $t ?></option>
-                    <?php endforeach; ?>
+                    <?= $opcionesTablas ?>
+                </select>
+
+                <label>¿Columna foránea?</label>
+                <select name="campos[${index}][fk_columna]" id="columna_fk_${index}">
+                    <option value="">-- Selecciona tabla primero --</option>
                 </select>
             `;
+
             contenedor.appendChild(div);
         }
+
+        function cargarColumnasForaneas(select, index) {
+            const tabla = select.value;
+            const columnaSelect = document.getElementById("columna_fk_" + index);
+            columnaSelect.innerHTML = '<option value="">Cargando...</option>';
+
+            if (!tabla) {
+                columnaSelect.innerHTML = '<option value="">-- Selecciona tabla primero --</option>';
+                return;
+            }
+
+            fetch(`../controllers/getColumns.php?tabla=${tabla}`)
+                .then(res => res.json())
+                .then(data => {
+                    columnaSelect.innerHTML = "";
+                    data.forEach(col => {
+                        const option = document.createElement("option");
+                        option.value = col;
+                        option.textContent = col;
+                        columnaSelect.appendChild(option);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error al cargar columnas:", err);
+                    columnaSelect.innerHTML = '<option value="">Error al cargar columnas</option>';
+                });
+        }
     </script>
-</head>
-<body>
-    <h2>🧩 Crear Nueva Tabla</h2>
-
-    <form action="../controllers/createTableController.php" method="POST">
-        <label>Nombre de la tabla:</label>
-        <input type="text" name="tabla" required>
-
-        <div id="campos"></div>
-
-        <div class="botones">
-            <button type="button" onclick="agregarCampo()">➕ Agregar campo</button>
-            <button type="submit">💾 Crear tabla</button>
-            <a href="tables.php" style="margin-left: 20px; color: #00427a;">← Volver</a>
-        </div>
-    </form>
 </body>
 </html>

@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/auditoriaHelper.php';
+
 $conexion = $_SESSION['conexion'] ?? null;
 
 if (!$conexion || !isset($_POST['tabla'], $_POST['id'], $_POST['pk'], $_POST['datos'])) {
@@ -33,7 +35,15 @@ try {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($valores);
 
-    // Redirigir al crud de vuelta con éxito
+    auditoriaHelper::log(
+    $_SESSION["usuario"]['nombre'] ?? 'desconocido', // usuario
+    'UPDATE',                                        // acción
+    $tabla,                                          // tabla
+    "Se modificó un registro con id $id"             // detalle
+);
+
+
+
     header("Location: ../views/crud.php?tabla=$tabla");
     exit();
 

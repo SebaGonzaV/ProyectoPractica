@@ -1,0 +1,26 @@
+[2025-07-22 10:18:33] Usuario: Array | Acción: CREATE | Tabla: cosas | Detalle: Se creó la tabla 'cosas' con 1 columnas
+[2025-07-22 10:18:38] Usuario: Administrador | Acción: DELETE | Tabla: cosas | Detalle: Se borró la tabla 'cosas'
+[2025-07-22 10:22:48] Usuario: Array | Acción: CREATE | Tabla: cosasas | Detalle: Se creó la tabla 'cosasas' con 1 columnas
+[2025-07-22 10:23:04] Usuario: Administrador | Acción: DELETE | Tabla: cosasas | Detalle: Se borró la tabla 'cosasas'
+[22-07-2025 04:45:22] Usuario: Administrador | Acción: UPDATE | Tabla: usuarios | Detalle: Se modificó un registro con id 1
+[22-07-2025 04:46:11] Usuario: Usuario de prueba | Acción: CREATE | Tabla: cosas | Detalle: Se creó la tabla 'cosas' con 1 columnas
+[22-07-2025 04:47:55] Usuario: Usuario de prueba | Acción: DELETE | Tabla: cosas | Detalle: Se borró la tabla 'cosas'
+[22-07-2025 04:48:33] Usuario: Usuario de prueba | Acción: INSERT | Tabla: servidores | Detalle: Se insertó un registro con id 
+[22-07-2025 04:52:13] Usuario: Usuario de prueba | Acción: INSERT | Tabla: servicios | Detalle: Se insertó un registro con id 
+[22-07-2025 04:52:53] Usuario: Usuario de prueba | Acción: INSERT | Tabla: servicios | Detalle: Se insertó un registro con id 
+[22-07-2025 04:52:57] Usuario: Usuario de prueba | Acción: DELETE | Tabla: servicios | Detalle: Se eliminó un registro con id 5
+[22-07-2025 04:52:59] Usuario: Usuario de prueba | Acción: DELETE | Tabla: servicios | Detalle: Se eliminó un registro con id 4
+[22-07-2025 04:53:12] Usuario: Usuario de prueba | Acción: DELETE | Tabla: servicio_servidor | Detalle: Se eliminó un registro con id 9
+[22-07-2025 04:53:14] Usuario: Usuario de prueba | Acción: DELETE | Tabla: servicio_servidor | Detalle: Se eliminó un registro con id 6
+[22-07-2025 04:53:18] Usuario: Usuario de prueba | Acción: INSERT | Tabla: servicio_servidor | Detalle: Se insertó un registro con id 
+[22-07-2025 05:06:27] Usuario: Administrador | Acción: EXPORTAR SQL | Tabla: prueba_relaciones | Detalle: Se exportó la base de datos prueba_relaciones como archivo SQL
+[22-07-2025 05:09:07] Usuario: Administrador | Acción: EXPORTAR SQL | Tabla: prueba_relaciones | Detalle: Se exportó la base de datos prueba_relaciones como archivo SQL
+[22-07-2025 05:20:12] Usuario: Administrador | Acción: EXPORTAR SQL | Tabla: prueba_relaciones | Detalle: Se exportó la base de datos prueba_relaciones como archivo SQL
+[22-07-2025 05:30:02] Usuario: Array | Acción: EXPORTAR | Tabla: prueba_relaciones | Detalle: Se exportó la base de datos 'prueba_relaciones' como archivo SQL
+[22-07-2025 05:32:35] Usuario: Administrador | Acción: EXPORT SQL | Tabla: prueba_relaciones | Detalle: Se exportó la base de datos prueba_relaciones como archivo sql
+[22-07-2025 05:41:17] Usuario: Administrador | Acción: EXPORT SQL | Tabla: prueba_relaciones | Detalle: Se exportó la base de datos prueba_relaciones como archivo sql
+[22-07-2025 05:47:54] Usuario: Array | Acción: EXPORTAR SQL | Tabla: prueba_relaciones | Detalle: Se exportó la base de datos prueba_relaciones como DEMO_EXPSQL.sql
+[22-07-2025 05:55:48] Usuario: Administrador | Acción: EXPORT | Tabla:  | Detalle: Se exportó la base 'prueba_relaciones' bajo el nombre pruebaFina.sql
+[22-07-2025 05:55:54] Usuario: Administrador | Acción: EXPORT | Tabla:  | Detalle: Se exportó la base 'prueba_relaciones' bajo el nombre pruebaFina.sql
+[22-07-2025 05:56:17] Usuario: Administrador | Acción: EXPORT | Tabla:  | Detalle: Se exportó la base 'prueba_relaciones' bajo el nombre LaPruebaFina.sql
+[22-07-2025 05:56:22] Usuario: Administrador | Acción: EXPORT | Tabla:  | Detalle: Se exportó la base 'prueba_relaciones' bajo el nombre LaPruebaFina.sql
